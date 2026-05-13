@@ -8,21 +8,21 @@
   },
   "trust_module": {
     "white_urls": [
-      "https://www.bangkokpost.com/thailand/politics/3253354/loan-decree-faces-pushback",
-      "https://www.bangkokpost.com/thailand/general/3253504/pm-signals-changes-to-visa-policy",
-      "https://www.set.or.th/",
-      "https://www.thaigov.go.th/",
-      "https://www.bangkokpost.com/business/investment/3253569/golds-downward-price-trend-is-over",
-      "https://www.bangkokpost.com/thailand/general/3253308/five-charged-with-illegally-supplying-guns-to-chinese-in-pattaya",
       "https://www.thairath.co.th/",
-      "https://www.bangkokpost.com/life/social-and-lifestyle/3253075/under-the-algorithms-thumb",
+      "https://www.bangkokpost.com/business/general/3254129/panel-to-probe-electricity-payments",
       "https://www.bot.or.th/",
-      "https://www.bangkokpost.com/thailand/general/3253165/communities-mourn-death-of-famed-tusker-plai-thong-bai",
+      "https://www.bangkokpost.com/business/general/3254174/confidence-dips-for-second-straight-month-in-april",
+      "https://www.bangkokpost.com/thailand/general/3253955/court-upholds-thai-conscription-law",
+      "https://www.bangkokpost.com/thailand/general/3254024/anutin-says-b400bn-loan-decree-cannot-be-derailed",
       "https://www.bangkokpost.com/",
-      "https://www.bangkokpost.com/thailand/politics/3253454/parole-unlikely-to-curb-thaksin",
-      "https://www.bangkokpost.com/thailand/general/3253298/nine-caught-with-250kg-african-ivory-smuggled-through-vietnam",
-      "https://www.bangkokpost.com/thailand/politics/3253133/former-pm-thaksin-released-from-prison",
-      "https://www.bangkokpost.com/business/general/3253439/nominee-crackdown-to-focus-on-tourist-islands"
+      "https://www.bangkokpost.com/thailand/general/3254139/bhumjaithai-defends-land-bridge-amid-criticism",
+      "https://www.bangkokpost.com/business/general/3254204/tourism-operators-hit-out-at-new-taxes",
+      "https://www.thaigov.go.th/",
+      "https://www.bangkokpost.com/business/general/3254294/ai-risks-spur-child-data-protection-push",
+      "https://www.bangkokpost.com/thailand/general/3254214/sihasak-says-peace-talks-not-enough",
+      "https://www.bangkokpost.com/business/general/3254184/thailand-determined-to-diversify-oil-imports",
+      "https://www.bangkokpost.com/world/3253920/work-not-over-after-hantavirus-evacuation",
+      "https://www.set.or.th/"
     ],
     "static_urls": [
       "https://www.thaigov.go.th/",

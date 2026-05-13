@@ -7,7 +7,21 @@
     "valid_url_suffix": "co.jp"
   },
   "trust_module": {
-    "white_urls": [],
+    "white_urls": [
+      "https://news.yahoo.co.jp/pickup/6579926?source=rss",
+      "https://news.yahoo.co.jp/pickup/6579932?source=rss",
+      "https://www.yahoo.co.jp/",
+      "https://news.yahoo.co.jp/pickup/6579930?source=rss",
+      "https://news.yahoo.co.jp/pickup/6579934?source=rss",
+      "https://news.yahoo.co.jp/pickup/6579928?source=rss",
+      "https://news.yahoo.co.jp/pickup/6579925?source=rss",
+      "https://www.japan.go.jp/",
+      "https://news.yahoo.co.jp/pickup/6579918?source=rss",
+      "https://news.yahoo.co.jp/pickup/6579927?source=rss",
+      "https://www.jnto.go.jp/",
+      "https://www.rakuten.co.jp/",
+      "https://www.nhk.or.jp/"
+    ],
     "static_urls": [
       "https://www.yahoo.co.jp/",
       "https://www.nhk.or.jp/",
