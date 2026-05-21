@@ -186,7 +186,8 @@ else
     # 组装战报尾部 (最近快照)
     MSG="$MSG
 
-🕒 **最近执行快照: [${LAST_MOD:-"System"}]**
+# 🕒 **最近执行快照: [${LAST_MOD:-"System"}]**
+🕒 **最近执行快照: ${LAST_MOD:-"System"}**
 时间: ${LAST_TIME:-"暂无数据"} (节点本地)
 结论: ${LAST_SCORE:-"暂无数据"}"
 
