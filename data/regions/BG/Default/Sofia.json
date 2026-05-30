@@ -8,22 +8,45 @@
   },
   "trust_module": {
     "white_urls": [
-      "https://www.apple.com/",
-      "https://www.microsoft.com/",
-      "https://en.wikipedia.org/wiki/Special:Random",
-      "https://en.wikipedia.org/wiki/Special:Random?r=42816",
-      "https://news.google.com/topstories?hl=bg&gl=BG&ceid=BG:bg",
-      "https://news.google.com/search?q=%D0%91%D1%8A%D0%BB%D0%B3%D0%B0%D1%80%D0%B8%D1%8F&hl=bg&gl=BG&ceid=BG:bg",
-      "https://news.google.com/search?q=%D0%A1%D0%BE%D1%84%D0%B8%D1%8F&hl=bg&gl=BG&ceid=BG:bg"
+      "https://www.vivacom.bg/",
+      "https://news.google.com/rss/articles/CBMiowFBVV95cUxONGpESzMyRktfN3NrTjd3cU9FYmJLRy0xQm00ZWxVcG5aakdIU0ZVS1JPVFo3djJacWFpMmcwNExYbUFGdm5kV1FkblB0RTFTUUdXRDNka2FtdmxPeVVQSUlrc190N29DaG83Rk5sUV9NUjJuUklWRWVtVjRtWFd6U1YwaGJRU3dzaVBOa2JMUkVoTU56T04waDZ1RUl5U3l4Rlg4?oc=5",
+      "https://news.google.com/rss/articles/CBMiXEFVX3lxTFBmaWtqdDd4VXZJbHlLbE5uQW14bEE1Qml3dGRDUGFaazczcUlNa1lZbXJubDZhZzlPbGRjNno5TDNIdEV0dEtPRmdzMUYxSm1INFhjVEJBNS0tbElj?oc=5",
+      "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNZlFaVFVIQmR6eHNTMU5BaG5NbVl3YzB6OXEzMkN3b1liWUJhbkdOcWVkQTdsS3JwMnpvSmJ1WFUxYkFhM3hJWDFvdzRXRW9RS3Rjc2Z2S3VoNjNiU0NFUzJCNkxSdlFrSzRmNmx6QnpRRzMyNlJkZ3h4YzBnVXhsSzd6SHMtMW5V?oc=5",
+      "https://news.google.com/rss/articles/CBMigwFBVV95cUxPcnNJSThfVUVvSmM1QWdnUVk5alh2ODVwUHFheVFfSnZFZDRwdUFUaEY4UVNPb1FqRGE4R3lrQkU2bGxSNzhkQ1ZMMWc0MmlFXzloQ3BSUEJHYVBuVmNjUnI5OE5RZUY4bmFyb2hBcGpDWTkyd3pwOE5GMEp3QldmX1Jfd9IBgwFBVV95cUxQSlpqdEE4bXBFTEQ4VV9EcGFqaGhfR1lWVjFfN0RJWXExRWdSb3hQUm1Pak1fbkxvWVo4ZDBlY2pXYWx3d2Q2Zmc1X0FkOTRGdHY1VXMyVTRGOHUxYzBiNUQtT2V4OTM3WkJFNUk5NjV2WWgzQWpJTUJ1Tl9kaEdEZTdLcw?oc=5",
+      "https://news.google.com/rss/articles/CBMikgFBVV95cUxOMk1OOWRuVHM4WENSQUZJQUg1ZDRIelRtOG5YVEhIOUU5ZjZiWmhKT2Nhdk9LSXM1OEl0X0NQNWRMQkszd1NYdUxoZklWUUFfYlowSHlVLXI5bV90bHVJV3hqeS1qaTZzV1RPcEtBbzlsUDhqV2NLNkk5UVVxbHZ4MUNvRnVBU2szWUExOWt6b28tZw?oc=5",
+      "https://news.google.com/rss/articles/CBMipgFBVV95cUxNRC1Kd29ZWXN6NFJ1dEpVSFIyVEpmNFNoM09tSFU1eTdyQXlEa2ZkUXBTWU5xMVZ4cGV2R3BkUDA3Q1FtcVdvM0dLUlo3aFRvNC1DLUV2d3lLLWxIMEVSSmRVb3pNUEFVOXJpQmdEM2ZaUjhLN2Zlbmp6c01yTXhURTlCR1hENmh2OTBrXzF0dU1lVkhLdU5lQklIdEJOQjVXcThNaTFR0gGrAUFVX3lxTE9OS2ZaaHlZd2hHQ3RrWHFlVEY0bFhGSEo5TjJGQWQ5Q2JzcGd0TFZBVVBqbDFMT2E5YzFwcU5CT3Y2b2lFVmQ2czZ4d05qUVhTMlBwXzBVS3VoTVA0LXZDOEdBWEtqTGJzOVczZmIwWFMzY0lfYUVVemxMU3ZsbVN1ZG85UTBnN3RPUXMyR3VRMlphcENVcUk0TTlLbFBkSnR3RVlfcUkxUWpXOA?oc=5",
+      "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPU2oyYUtDcnpIU0dqVnhfdVVqNTBoZXE1TVBUUFBqWllfTGtmRS02clpkaERZV2tGdExYZzR6cDNlZm10b0tCUjBLbHdfYUFWbnFoX0RCUnU1ODBGQ3dYX3ZnMC1SVUZnVi05UVBtLW1LeFdMUVRUUjNCVExlUzVmUWZWSWkzT1B0RlRpLWYxUk1MQ2U0YWJJU05NbXZESTZhOUVUaUg0Znp0M1BkdFdLTUVyaHFUZVpUaEhjejZYdHNBQQ?oc=5",
+      "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNZXAxWTlEc3MxQ05tS1J4cmcteGVoR0RjOHIxLS1JVVRtUFc4a2tMMGhSTHdVTHFINnJpOW91YzU1TTJIREgtTzBoaTR4UjZVa0g5b2tvXy15ZFFJTWR4Tkh3eVVIOWN4Y0lkcHJtQllUcXRYcDVKekhnU1oyX2htRFdMTmNlQ05MM0lheFBTVUZQbjRUXzJkNTdkczJhc1V0OEhfZXBXS09pRTlPSHhYdnloZHpTeHUx?oc=5",
+      "https://news.google.com/rss/articles/CBMiWkFVX3lxTE9SSGxkc0RzcHdhZDZFZUZIM3ZYOS1iejNQaGhJaUVDMzFib1FuZHpEeFB6M2NjTFBqVUw3YzdDYXNocmFUUHpXeWtJaGRaMjZXYWRUT1JOWDR4Zw?oc=5",
+      "https://news.google.com/rss/articles/CBMitAFBVV95cUxNUDR0UXZick1NTnJfUXhoeFl3Y0V5U0tZa0IyQXBvNzhGYXB5bnljc1BzNmZMR3dOS21LMWczSHpDZ1UxSjNYdXdXLXBwNkx1UHIxcmdPVm0xeXF5RlQ0MkR6SWQ4VHBLNzJaMTJaSUF1T3BRUzJUeWlXem1aTVluMkJ1NmRhRk9YZjVlUktCUEtrcVJvanJNajNyVnhGVXFOM29hZXlsaV85NVRlaUxxVkk0LW0?oc=5",
+      "https://news.google.com/rss/articles/CBMiwwFBVV95cUxOQWRGaXZDZ0UzLVhfZEVEenVSNDRWTkF0NUdqMHVMUV9LU1pxdmpCZkR3ZXlkMkQ5Zm00UG1xV0hpUjloNDAzM0d1YmVuNEV6NHhhLXZIbmJUc0IyMXA1LXh2WWZVa3hZVjlqdE9DbkROeGkxdTctZ25qeUdpMWhVU01aOFFXZ21KQUd4eGFoeTlsV3RiY01nUFVTdFFUQXNEYXJEVmpiU2dXRHFkOWV1QlFCUzE4NFVVTkNrb0xKZ3pjUXc?oc=5",
+      "https://www.nra.bg/",
+      "https://news.google.com/rss/articles/CBMimwFBVV95cUxOSTBJMXBkT3o0U21aWGZ6TDFhcUNFeUVnUGJ1cTNsOGI4VTN0UHRETmJHLVNtWWZYNWYtME1mV3JmYUZMZ3pmUzZMYldNdVhMZTR5YjJCTmJOZ19XaVBBWXhGODZXYWtKSkRJeEc2czBCMC13WnZ3SEhObzNHMkJpUVpzX2NiZEpuS3NoUG04bzItWm1UNVVBT3BMNA?oc=5",
+      "https://news.google.com/rss/articles/CBMiowFBVV95cUxOZjNyS2ItTE1IMXkwNDg2VXJJSUdiekhiV0FyM01WbFBpMU5UZDU5bFhMN2w3clJTLWtKUmRYc2hNbjJ6WnJvSWh2TUNuS3lUZnVJSE5WODVJRHd4bnk1OW5XSXYyOEtJMmFQRTNyVTBsNmh1R3NtYzZIMWJxOE52Q1BHRGxSV29qNDBjN1prMi1BRUxSSzllalh4c0YzODhPNC1N?oc=5",
+      "https://www.gov.bg/",
+      "https://news.google.com/rss/articles/CBMiWEFVX3lxTFBRdm5nejBnY1Z6a0tzSmZMR3lpSjJ4MEROeG9jcEg5X2Y4amthSjJMVnNsT0dPeWkwLWlvcFlTVkQ4cWZvN0U2czdPNXR3Q3B4dHJmVzdIQUw?oc=5",
+      "https://news.google.com/rss/articles/CBMimwFBVV95cUxQbzJ3cHVVNUhMMnhTOTdYZlFHRlZzckdqcm1xbno0WjlWU0FrVjZpTy1qYk5IN0c2NDlpNXdOcjZIVGlpR1ZpcVAtcUNPbk16aWx3SlNFaUNidUZmWmlTTHp6ekNMXzNTNUJpV1IzUmVNYmlGdW5pbWlVTXJGYUxWaG9CaUVVbHktaHZYX1d2dE85NWkyN0gzcUlaMA?oc=5",
+      "https://www.bnb.bg/",
+      "https://news.google.com/rss/articles/CBMiWEFVX3lxTE1XZVJUSEZLaURJX3BJXzVwdGU5U3lhempRdHNZUHRZYVNseHNoQldZQ003bEZ3cnlBZm5DeWRNVFl4eGVLYmxydE9tTmxVQUwyZE9ISEg0a24?oc=5",
+      "https://news.google.com/rss/articles/CBMijAFBVV95cUxQR1dzMnQ5T3k5RzBSNTF1dS02RmhwVF9Jalh4enRmbkIxVFdMU1N5Yk5rNUQyVGM1NHlDVzFnTzR3MEJqcjhEYktQY29JVE5wYTU3NXdvMmoxSmNERWhpdEFZVlRDNGlJM19nOThmZEZsQm5CQ1BCd0V5czRfVzRoVThtWDRTbnpGSUV6aw?oc=5",
+      "https://news.google.com/rss/articles/CBMikAFBVV95cUxNdUVuSnpYTTBTS002MVdnMEVkTXI3bG1xcEY2ZjI3UGJxeEdZV2Z0aHk1Q1cyZm5KR2k2UmFtQk10ckVLdllSb1Znb2FtOTQ3TjF2SDVQYVB2RzVOLXN4czRQblNocVdRNDI0b2Z0bWExMmdnZm9wbTFnWFVKQUlabDc3Q0NNdVl3QnFrMGVLSFQ?oc=5",
+      "https://www.bdz.bg/",
+      "https://news.google.com/rss/articles/CBMixgNBVV95cUxNTFZyLVNiVGlBOW5SZDdRR2J2cmc2MG0zelVwMUJZZnBzX3puUEFZb0tZSFRQVWxoazB2WkdRSXEzU1paRnh2bExuc3NlZnNBZVNuWXZ3WnBHdTVUb19FbDJjLTJYLXFhNHFaYUx0OHhpZkVaeklTRE9nNUw2dktOUFFQb0E5anMzUU9YOWI5SzcwNXNTZDZ5V3hNWklnRk9fZGZyUFJNRlN1R0JGSnpqMlluUmwySjZYV1V0bWtlVmRzZl9MYzhSbEFGZWxMeTV2bEtNV2lfejNYRjVITDYyb2hwUzJQWGpydWN0Y29ibTlrX2NreFduQTRFZmxoRjgtT3FxRlplLWlSVkp6OEJoX3YzUWp2NENZWkVETzlVd0JiY2QtYlRDRXBzQXpmRVZNY1k4ZmpuMGRWcWpjYkc4QnhUcXRqUV94MU56aVVlTk9PV1VlRHVIZGZMQnk5YWxxVVJOcWw4MjdaR2lvYjdjV3JvcFV0T1NrVk54M0E4Qm95Q1dmNTJHcnRqWjh4enYxVG1QaDlvQWZjcWlINjVncVJRWUhER3liNUJoZ3RVSVgtMDZpQUREWl9jaURrRXR5WDZ5SndB?oc=5",
+      "https://news.google.com/rss/articles/CBMilgFBVV95cUxON2JKenBucklCN29ZSFhuNWREYVhvMURYb2FyT0hRMkRzSjktWlM2YWtIWm5kcktoX1dPa1d5cU8wYWxVX1hOcHd3Uk1hLThzcG02bHlsR0dlQ0JyTVNfYVZBSnA2UG1LWHJPbV9EX2JHek5jQUp4dnVMNjdXenN6bzdlSEh6Mm0zZ0tLTWU2V2dOTEo2VFE?oc=5",
+      "https://news.google.com/rss/articles/CBMi_gFBVV95cUxQajMxQkVUajE2TXNTaVBCcC1sRFRObWpIRmNPTkp5RU1sMng3UnpTY3RibWVQcUJRbGMxR3k5U2lmMUZRYTBxRG1JMjNRMWN2cjJFVGgzZ3liWnQ4eWNTQXpzSktGN0x6dExkMno4MlZrbWRaN2hjZXZkN2d0WTVYUjdscm9PTW9kZEVsdzM0MnJhRG5FQUNwanhHMEFTaHE2LUh1MUp5OHVnN3Y3TTJKd05wajBaU0dTS1hlQXp5cHY4T2VydGV0ZEQ2R1B1czhTZDVTd3lOTGFSX3FZYmxwVnAxZmRYcVhKbHgtR2U1T3dwSnNOMGwwRVpSSlM5dw?oc=5",
+      "https://news.google.com/rss/articles/CBMiogFBVV95cUxNeHNVdFdLR2dydy00c09FMllnd2djalJyRW8ycUlfZGpLOFo3c2hzVVJKN3V5NTluakFER2hyS2xfVUhud0hhalhYYnJ0WGQteS1LU2dXUEZicnBpSVBCLWhlaXp4YU5paTFieW91UEdySXU5elV5NllURm1sNEhUTzNVclVERTZSaTZ4VHcyZ1E1M3R6REU4V0lyVzFjU2ZWdVE?oc=5",
+      "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOdTF2RnlsVEx6NElkeGpiUXUtRUFsRGN3R3F3SDhtZ1F6dVI5ZDBwaHI3dUpZUTgtaWFscW51Rzd1eS1obzhmMVZWQndmRUxjSHJPelg2NllJRXJpUHNKY0RMQWhGSTFBV0J1MkhmUjAxSEgwWUtGZnVtSV9qZVo3dWoxdjBHbk1UUGJXdFBJNDFDd3hhMjZhSXliRGNUbjlMQzJKNGdMWlQ3OGM?oc=5",
+      "https://news.google.com/rss/articles/CBMiWkFVX3lxTE9ZWGhRb2lJNHI0eHo4VWJ6MEFQQU9ROFY5MVd5dG9wTk02Y0xLb3l4X2lHVkoxUGgyRjkxZzlwanFncUNUTE1rSTdZT1RjUGhQaXd4ZjJKb21ldw?oc=5",
+      "https://news.google.com/rss/articles/CBMitAFBVV95cUxNSDdnb2N4UnVLSmxjajBhYTA4ZGxaRndyNXVUby1ZLVRZeGpDelhicTY1Q3libVlxd3A1SjdMcjYxQVEtSWJCSEhhdUVudGRZZ2VHbDdhN3FJLTZ2YlQwMDBrYmVGZXVwRXFwLWFISEpTc2ZTN0NNanhLYXhvcE5lMS1XYWdMS3FLTWZPSHJTekk5ak5BcF81ejMyNFFaTGUxaVZCOFdtbllLZTZUemJONmVTR3A?oc=5"
     ],
     "static_urls": [
-      "https://www.gov.bg/",
-      "https://www.nra.bg/",
       "https://www.bnb.bg/",
-      "https://www.bdz.bg/",
+      "https://www.btvnovinite.bg/",
       "https://www.uni-sofia.bg/",
+      "https://www.nra.bg/",
+      "https://www.gov.bg/",
       "https://www.vivacom.bg/",
-      "https://www.btvnovinite.bg/"
+      "https://www.bdz.bg/"
     ]
   }
 }
