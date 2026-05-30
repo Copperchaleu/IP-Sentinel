@@ -76,7 +76,8 @@ generate_signed_url() {
     local current_t=$(date +%s)
     
     local payload="${action_path}:${current_t}"
-    local signature=$(echo -n "$payload" | openssl dgst -sha256 -hmac "$CHAT_ID" | awk '{print $NF}')
+    # [v4.1.7 致命修复] 弃用 -hmac，改用 -macopt 标准语法，彻底杜绝 TG 群组负数 ID 导致的 OpenSSL 参数注入崩溃
+    local signature=$(echo -n "$payload" | openssl dgst -sha256 -mac HMAC -macopt key:"$CHAT_ID" | awk '{print $NF}')
     
     echo "https://${target_ip}:${target_port}${action_path}?t=${current_t}&sign=${signature}"
 }
