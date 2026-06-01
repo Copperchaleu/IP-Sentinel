@@ -219,9 +219,13 @@ done
 rm -f /etc/local.d/ip_sentinel.start 2>/dev/null
 
 if [ "$UPGRADE_MODE" == "true" ]; then
+    # [v4.2.2 终极保障] 平滑升级时强制销毁旧版 TLS 证书与旧版 IP 缓存，逼迫下层组件重铸健康双栈装甲
+    rm -f "${INSTALL_DIR}/core/cert.pem" "${INSTALL_DIR}/core/key.pem" "${INSTALL_DIR}/core/.last_ip" 2>/dev/null
+    echo -e "🧹 历史底层缓存及残旧 TLS 证书已强制销毁，准备重铸安全装甲。"
+
     if [ "$KEEP_LOGS" == "false" ]; then
         rm -rf "${INSTALL_DIR}/logs" 2>/dev/null
-        echo -e "🗑️ 历史日志已按指令清空。"
+        echo -e "🗑️ 历史战地日志已按指令清空。"
     else
         echo -e "📦 历史配置与战地日志已妥善保留。"
     fi
@@ -411,8 +415,31 @@ if [ "$UPGRADE_MODE" == "false" ]; then
     # ----------------------------------------------------------
     echo -e "\n\033[36m[4.5/7] 正在探测本机网络栈与可用出口 (多节点雷达扫描中)...\033[0m"
 
-    DETECT_V4=$( (curl -4 -s -m 3 api.ip.sb/ip || curl -4 -s -m 3 ifconfig.me || curl -4 -s -m 3 ipv4.icanhazip.com) 2>/dev/null | grep -E "^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" | head -n 1 | tr -d '[:space:]')
-    DETECT_V6=$( (curl -6 -s -m 3 api.ip.sb/ip || curl -6 -s -m 3 ifconfig.me || curl -6 -s -m 3 ipv6.icanhazip.com) 2>/dev/null | grep -E "^[0-9a-fA-F:]+.*:" | head -n 1 | tr -d '[:space:]')
+    RAW_DETECT_V4=$( (curl -4 -s -m 3 api.ip.sb/ip || curl -4 -s -m 3 ifconfig.me || curl -4 -s -m 3 ipv4.icanhazip.com) 2>/dev/null | grep -E "^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" | head -n 1 | tr -d '[:space:]')
+    RAW_DETECT_V6=$( (curl -6 -s -m 3 api.ip.sb/ip || curl -6 -s -m 3 ifconfig.me || curl -6 -s -m 3 ipv6.icanhazip.com) 2>/dev/null | grep -E "^[0-9a-fA-F:]+.*:" | head -n 1 | tr -d '[:space:]')
+
+    # [v4.2.2 源头防线] 引入工业级网卡追踪，双重过滤 WARP/TUN/NAT 等假公网环境
+    DETECT_V4=""
+    if [[ -n "$RAW_DETECT_V4" ]]; then
+        V4_DEV=$(ip route get 8.8.8.8 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="dev") print $(i+1)}' | head -n 1)
+        if [[ "$V4_DEV" =~ ^(warp|wgcf|tun|tap|docker|br-|lo) ]] || \
+           [[ "$RAW_DETECT_V4" =~ ^104\.28\. ]] || \
+           [[ "$RAW_DETECT_V4" =~ ^10\.|^192\.168\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\. ]]; then
+            echo -e " \033[33m⚠️ 雷达警告: 发现异常 IPv4 出口 ($RAW_DETECT_V4) 经由虚拟网卡 ($V4_DEV)，已从通讯候选池中隔离。\033[0m"
+        else
+            DETECT_V4="$RAW_DETECT_V4"
+        fi
+    fi
+
+    DETECT_V6=""
+    if [[ -n "$RAW_DETECT_V6" ]]; then
+        V6_DEV=$(ip -6 route get 2001:4860:4860::8888 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="dev") print $(i+1)}' | head -n 1)
+        if [[ "$V6_DEV" =~ ^(warp|wgcf|tun|tap|docker|br-|lo) ]] || [[ "$RAW_DETECT_V6" =~ ^fe80:|^::1 ]]; then
+            echo -e " \033[33m⚠️ 雷达警告: 发现异常 IPv6 出口 ($RAW_DETECT_V6) 经由虚拟网卡 ($V6_DEV)，已从通讯候选池中隔离。\033[0m"
+        else
+            DETECT_V6="$RAW_DETECT_V6"
+        fi
+    fi
 
     IP_OPTIONS=()
     IP_PROTO=()
@@ -461,7 +488,34 @@ if [ "$UPGRADE_MODE" == "false" ]; then
         SAFE_PUBLIC_IP="$PUBLIC_IP"
     fi
 
+    # ==========================================================
+    # [v4.2.2 终极架构] 智能主副容灾弹药装填 (Multi-IP Fallback)
+    # 严格排序: 1.养护IP (SAFE_PUBLIC_IP) 2.可用IPv4 3.可用IPv6
+    # ==========================================================
+    echo -e "\n\033[36m[4.6/7] 正在装填通讯容灾防线 (Multi-IP Fallback)...\033[0m"
+    COMM_IP="$SAFE_PUBLIC_IP"
+    
+    # 注入次发弹药 (可用 IPv4)
+    if [[ -n "$DETECT_V4" ]] && [[ "$DETECT_V4" != "$PUBLIC_IP" ]]; then
+        COMM_IP="${COMM_IP},${DETECT_V4}"
+    fi
+    
+    # 注入保底弹药 (可用 IPv6，带括号保护)
+    if [[ -n "$DETECT_V6" ]] && [[ "$DETECT_V6" != "$PUBLIC_IP" ]]; then
+        [[ "$DETECT_V6" != *"["* ]] && SAFE_V6="[${DETECT_V6}]" || SAFE_V6="$DETECT_V6"
+        COMM_IP="${COMM_IP},${SAFE_V6}"
+    fi
+    
+    SAFE_COMM_IP="$COMM_IP"
+    
+    if [[ "$COMM_IP" == *","* ]]; then
+        echo -e " \033[32m✅ 成功组装多宿主容灾通讯专线: $SAFE_COMM_IP\033[0m"
+    else
+        echo -e " \033[33m⚠️ 本机仅有单一出口，建立单轨通讯模式: $SAFE_COMM_IP\033[0m"
+    fi
+
     echo -n "🕵️ 正在进行出站链路试射 (NAT环境与双栈嗅探)..."
+    
     RAW_TEST_IP=$(echo "$SAFE_PUBLIC_IP" | tr -d '[]')
     
     if [[ "$RAW_TEST_IP" == *":"* ]]; then
@@ -536,6 +590,7 @@ LOG_FILE="${INSTALL_DIR}/logs/sentinel.log"
 IP_PREF="$IP_PREF"
 PUBLIC_IP="$SAFE_PUBLIC_IP"
 BIND_IP="$BIND_IP"
+COMM_IP="$SAFE_COMM_IP"
 
 NODE_NAME="$NODE_NAME"
 NODE_ALIAS="$NODE_ALIAS"
@@ -580,6 +635,41 @@ if [ "$UPGRADE_MODE" == "true" ]; then
         BIND_IP="$NEW_BIND_IP"
     else
         SAFE_PUBLIC_IP="${PUBLIC_IP}"
+    fi
+
+    # [v4.2.2 热修复] 为老版本平滑补齐多宿主容灾通讯 IP
+    if ! grep -q "^COMM_IP=" "$CONFIG_FILE"; then
+        echo -e "\n🔄 [平滑迁移] 正在为老节点无损注入 v4.2.2 容灾通讯架构..."
+        TMP_PUB_IP=$(grep "^PUBLIC_IP=" "$CONFIG_FILE" | cut -d'"' -f2 | tr -d '[]')
+        
+        RAW_V4=$(curl -4 -s -m 3 api.ip.sb/ip 2>/dev/null | tr -d '[:space:]')
+        RAW_V6=$(curl -6 -s -m 3 api.ip.sb/ip 2>/dev/null | tr -d '[:space:]')
+        
+        V4_DEV=$(ip route get 8.8.8.8 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="dev") print $(i+1)}' | head -n 1)
+        if [[ "$V4_DEV" =~ ^(warp|wgcf|tun|tap|docker|br-|lo) ]] || [[ "$RAW_V4" =~ ^104\.28\. ]] || [[ "$RAW_V4" =~ ^10\.|^192\.168\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\. ]]; then
+            RAW_V4=""
+        fi
+        
+        V6_DEV=$(ip -6 route get 2001:4860:4860::8888 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="dev") print $(i+1)}' | head -n 1)
+        if [[ "$V6_DEV" =~ ^(warp|wgcf|tun|tap|docker|br-|lo) ]] || [[ "$RAW_V6" =~ ^fe80:|^::1 ]]; then
+            RAW_V6=""
+        fi
+        
+        [[ "$TMP_PUB_IP" == *":"* ]] && NEW_COMM_IP="[${TMP_PUB_IP}]" || NEW_COMM_IP="$TMP_PUB_IP"
+        
+        if [[ -n "$RAW_V4" ]] && [[ "$RAW_V4" != "$TMP_PUB_IP" ]]; then
+            NEW_COMM_IP="${NEW_COMM_IP},${RAW_V4}"
+        fi
+        
+        if [[ -n "$RAW_V6" ]] && [[ "$RAW_V6" != "$TMP_PUB_IP" ]]; then
+            NEW_COMM_IP="${NEW_COMM_IP},[${RAW_V6}]"
+        fi
+        
+        echo "COMM_IP=\"$NEW_COMM_IP\"" >> "$CONFIG_FILE"
+        SAFE_COMM_IP="$NEW_COMM_IP"
+        echo -e " \033[32m✅ 成功注入容灾通讯专线: $SAFE_COMM_IP\033[0m"
+    else
+        SAFE_COMM_IP=$(grep "^COMM_IP=" "$CONFIG_FILE" | cut -d'"' -f2)
     fi
 
     if ! grep -q "^NODE_NAME=" "$CONFIG_FILE"; then
@@ -873,7 +963,8 @@ EOF
 # ----------------------------------------------------------
 if [[ -n "$TG_TOKEN" ]] && [[ -n "$CHAT_ID" ]]; then
     
-    REG_MSG="#REGISTER#|${REGION_CODE}|${NODE_NAME}|${SAFE_PUBLIC_IP}|${AGENT_PORT}|${NODE_ALIAS}|${ENABLE_OTA}"
+    # 注册报文中塞入多宿主弹匣 SAFE_COMM_IP
+    REG_MSG="#REGISTER#|${REGION_CODE}|${NODE_NAME}|${SAFE_COMM_IP}|${AGENT_PORT}|${NODE_ALIAS}|${ENABLE_OTA}"
     
     if [ "$UPGRADE_MODE" == "true" ]; then
         OLD_VERSION=$(grep "^AGENT_VERSION=" "$CONFIG_FILE" | cut -d'"' -f2)
@@ -883,7 +974,8 @@ if [[ -n "$TG_TOKEN" ]] && [[ -n "$CHAT_ID" ]]; then
             echo -e "\n📡 [路由枢纽] 正在执行跨代架构重组 (v${OLD_VERSION} -> v${TARGET_VERSION})..."
             TEXT_MSG="✨ *IP-Sentinel 引擎热更新完成！*
 📍 节点：\`${NODE_ALIAS}\`
-🌐 IP：\`${SAFE_PUBLIC_IP}\`
+🌐 养护 IP：\`${SAFE_PUBLIC_IP}\`
+📡 容灾 IP：\`${SAFE_COMM_IP}\`
 🚀 状态：v${TARGET_VERSION} OTA 动态活体引擎已部署
 
 ⚠️ *战区架构已重组，请务必点击下方指令并发送，以同步新的防撞档案：*
@@ -898,7 +990,8 @@ if [[ -n "$TG_TOKEN" ]] && [[ -n "$CHAT_ID" ]]; then
             echo -e "\n📡 [路由枢纽] 正在执行静默平滑升级 (v${OLD_VERSION} -> v${TARGET_VERSION})..."
             TEXT_MSG="✨ *IP-Sentinel 引擎热更新完成！*
 📍 节点：\`${NODE_ALIAS}\`
-🌐 IP：\`${SAFE_PUBLIC_IP}\`
+🌐 养护 IP：\`${SAFE_PUBLIC_IP}\`
+📡 容灾 IP：\`${SAFE_COMM_IP}\`
 🚀 状态：v${TARGET_VERSION} OTA 动态活体引擎已部署"
 
             JSON_PAYLOAD=$(jq -n --arg cid "$CHAT_ID" --arg txt "$TEXT_MSG" --arg cb "manage:${NODE_NAME}" '{chat_id: $cid, text: $txt, parse_mode: "Markdown", reply_markup: {inline_keyboard: [[{text: "⚙️ 调出该节点控制台", callback_data: $cb}]]}}')
@@ -918,7 +1011,8 @@ if [[ -n "$TG_TOKEN" ]] && [[ -n "$CHAT_ID" ]]; then
         echo -e "\n📡 正在向指挥部发送注册暗号..."
         TEXT_MSG="✨ *IP-Sentinel 部署成功！*
 📍 区域：${REGION_NAME}
-🌐 IP：${SAFE_PUBLIC_IP}
+🌐 养护 IP：${SAFE_PUBLIC_IP}
+📡 容灾 IP：${SAFE_COMM_IP}
 🔌 端口：${AGENT_PORT}
 
 🔑 *请点击下方指令复制并回复给机器人：*
@@ -946,22 +1040,30 @@ echo "⚙️ 哨兵现已开启 [每20分钟] 的高频高拟真养护循环。"
 if [[ -n "$TG_TOKEN" ]]; then
     echo "📡 Webhook 监听已启动 (端口: $AGENT_PORT) 并向中枢发送了注册请求。"
     
+    # [v4.2.2 防火墙修正] 适配多宿主 IP 提示
+    IS_V6_COMM="false"
+    [[ "$SAFE_COMM_IP" == *":"* ]] && IS_V6_COMM="true"
+    
     FW_MSG=""
     if command -v ufw >/dev/null 2>&1 && ufw status | grep -qw active; then
         FW_MSG="ufw allow $AGENT_PORT/tcp"
     elif command -v firewall-cmd >/dev/null 2>&1 && systemctl is-active firewalld | grep -qw active; then
         FW_MSG="firewall-cmd --zone=public --add-port=$AGENT_PORT/tcp --permanent && firewall-cmd --reload"
     elif command -v iptables >/dev/null 2>&1; then
-        if [[ "$SAFE_PUBLIC_IP" == *":"* ]]; then
-            FW_MSG="ip6tables -I INPUT -p tcp --dport $AGENT_PORT -j ACCEPT"
+        if [ "$IS_V6_COMM" == "true" ]; then
+            if command -v ip6tables >/dev/null 2>&1; then
+                FW_MSG="ip6tables -I INPUT -p tcp --dport $AGENT_PORT -j ACCEPT"
+            else
+                FW_MSG="iptables -I INPUT -p tcp --dport $AGENT_PORT -j ACCEPT  # 提示: 系统缺失 ip6tables"
+            fi
         else
             FW_MSG="iptables -I INPUT -p tcp --dport $AGENT_PORT -j ACCEPT"
         fi
     fi
     
-    echo -e "\n\033[31m⚠️ 【高危警告】您的节点身份已永久锁定为公网 IP: $SAFE_PUBLIC_IP\033[0m"
+    echo -e "\n\033[31m⚠️ 【高危警告】您的节点通讯寻址池已锁定为: $SAFE_COMM_IP\033[0m"
     echo -e "\033[33m为确保 Master 司令部能够成功下发指令，您【必须】前往云服务商 (如 AWS/Oracle/阿里云 等) 的网页控制台中，将安全组 (Security Group) 防火墙的 TCP $AGENT_PORT 端口彻底放行！\033[0m"
-    echo -e "\033[31m⛔ 禁止尝试通过修改脚本强行绑定局域网/内网 IP 来绕过通信阻断，这无异于掩耳盗铃，将彻底摧毁本系统“公网IP信用养护”的核心目标！\033[0m\n"
+    echo -e "\033[31m⛔ 本系统已开启全域双栈监听，禁止尝试通过修改脚本强行绑定局域网 IP 来绕过通信阻断！\033[0m\n"
     if [ -n "$FW_MSG" ]; then
         echo "💡 检测到本地系统防火墙开启，您可以尝试执行以下命令放行本机端口 (注意: 云端安全组仍需您手动放行)："
         echo -e "\033[36m   $FW_MSG\033[0m"

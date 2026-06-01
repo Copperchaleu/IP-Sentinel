@@ -55,19 +55,27 @@ if [ -n "$AGENT_IP" ]; then
     fi
 fi
 
-# [v4.1.8 核心修复] 彻底解决 IPv6 致命耳聋漏洞 (Socket Binding Mismatch)
-# 在拉起 Python 引擎前，由 Bash 强行锁定底层网络栈监听维度，抛弃脆弱的内部解析
-if [[ "$AGENT_IP" == *":"* ]]; then
-    export BIND_ADDR="::"
-    echo "🌐 [Agent] 协议栈识别: 侦测到 IPv6 基因，底层路由强锁定至 [::]"
-else
-    export BIND_ADDR="0.0.0.0"
-    echo "🌐 [Agent] 协议栈识别: 侦测到 IPv4 基因，底层路由强锁定至 0.0.0.0"
-fi
+# [v4.2.2 终极架构] 彻底剥离 Bash 对底层网络栈的干预，将控制权全权移交 Python 全域引擎
+echo "🌐 [Agent] 底层网络栈已解锁，准备切入全域双栈监听模式 (Dual-Stack Universal Bind)"
 
 # ==========================================================
 # [加密通信] 强制构建自签名 TLS 装甲，屏蔽中间人嗅探
 # ==========================================================
+CERT_FILE="${INSTALL_DIR}/core/cert.pem"
+KEY_FILE="${INSTALL_DIR}/core/key.pem"
+
+# [v4.2.2 热修复] 检查证书是否过于陈旧，若是则强制销毁重铸 (保障平滑升级的 TLS 健康)
+if [ -f "$CERT_FILE" ]; then
+    CERT_DATE=$(openssl x509 -noout -startdate -in "$CERT_FILE" 2>/dev/null | cut -d= -f2)
+    if [[ -n "$CERT_DATE" ]]; then
+        CERT_EPOCH=$(date -d "$CERT_DATE" +%s 2>/dev/null || echo 0)
+        V422_EPOCH=$(date -d "2026-05-31" +%s 2>/dev/null || echo 1780185600)
+        if [ "$CERT_EPOCH" -lt "$V422_EPOCH" ]; then
+            echo "🧹 [Agent] 侦测到旧版 (v4.2.2 前) 遗留 TLS 装甲，正在执行强制物理销毁..."
+            rm -f "$CERT_FILE" "$KEY_FILE"
+        fi
+    fi
+fi
 CERT_FILE="${INSTALL_DIR}/core/cert.pem"
 KEY_FILE="${INSTALL_DIR}/core/key.pem"
 if [ ! -f "$CERT_FILE" ] || [ ! -f "$KEY_FILE" ]; then
@@ -479,17 +487,31 @@ import socket
 # ----------------------------------------------------------
 # [核心架构] 多线程非阻塞 Socket 模型 (抵抗 Slowloris 及阻塞攻击)
 # ----------------------------------------------------------
-class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+class DualStackServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = True
+    def server_bind(self):
+        # [核心魔改] 强行解除 Linux/Unix 的 IPv6 独占锁
+        # 实现一个 Socket 对象同时接管 IPv4 (0.0.0.0) 和 IPv6 (::) 的全域监听防漏接机制
+        if self.address_family == socket.AF_INET6:
+            try:
+                self.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+            except Exception:
+                pass
+        super().server_bind()
 
-# [v4.1.8 终极修复] 废除脆弱的 Python 内置解析，直接读取 Bash 注入的底层环境变量
-bind_addr = os.environ.get('BIND_ADDR', '0.0.0.0')
-if bind_addr == "::":
-    ThreadedServer.address_family = socket.AF_INET6
-else:
-    ThreadedServer.address_family = socket.AF_INET
+# [v4.2.2 终极架构] 彻底抛弃配置文件的 IP 束缚，强行探测系统底层的双栈能力
+bind_addr = "::"
+address_family = socket.AF_INET6
+try:
+    # 探针：如果机器是纯 IPv4 (连内核级的 IPv6 模块都没有被加载)，强绑 :: 会引发 OSError，此时自动降维
+    s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+    s.close()
+except OSError:
+    bind_addr = "0.0.0.0"
+    address_family = socket.AF_INET
 
-httpd = ThreadedServer((bind_addr, PORT), AgentHandler)
+DualStackServer.address_family = address_family
+httpd = DualStackServer((bind_addr, PORT), AgentHandler)
 
 # ----------------------------------------------------------
 # [加密通信] 强制全网挂载 TLS 加密隧道上下文
