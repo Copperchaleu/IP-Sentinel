@@ -1,8 +1,7 @@
-cat > install/ui_menu.sh << 'EOF'
 #!/bin/bash
 # ==========================================================
-# 模块名称: ui_menu.sh (v4.3.0 战术增强版)
-# 核心功能: 交互式菜单、LBS 地图解析、中枢默认联控、多型防火墙全栈双栈自动化放行
+# 模块名称: ui_menu.sh
+# 核心功能: 交互式菜单、LBS 地图解析、Telegram 控制中枢配置
 # ==========================================================
 
 do_fetch_map() {
@@ -92,7 +91,7 @@ do_interactive_setup() {
         KEYWORD_FILE="${KEYWORD_MAP[$C_SEL]}"
         REGION_CODE="$COUNTRY_ID" 
 
-        echo -e "\n\033[36m📍 【第二级】正在检索 [$COUNTRY_ID] 的行政区 data ...\033[0m"
+        echo -e "\n\033[36m📍 【第二级】正在检索 [$COUNTRY_ID] 的行政区数据...\033[0m"
         jq -r ".continents[] | select(.id==\"$CONT_ID\") | .countries[] | select(.id==\"$COUNTRY_ID\") | .states[] | \"\(.id)|\(.name)\"" "${SECURE_TMP}/map.json" > "${SECURE_TMP}/states.txt"
         STATE_COUNT=$(wc -l < "${SECURE_TMP}/states.txt")
 
@@ -143,10 +142,10 @@ do_interactive_setup() {
         ENABLE_GOOGLE="true"
         ENABLE_TRUST="true"
 
-        # ----------------------------------------------------------
-        # [优化项 1] 接入司令部远程联调默认选项提升为 y
-        # ----------------------------------------------------------
         echo -e "\n[4/7] 是否接入 Master 司令部进行远程联控？ (y/n)"
+        # ----------------------------------------------------------
+        # [优化项 1] 默认选择改为 y
+        # ----------------------------------------------------------
         read -p "请输入选择 [y/n] (默认y): " TG_CHOICE
         TG_CHOICE=${TG_CHOICE:-y}
         
@@ -166,8 +165,12 @@ do_interactive_setup() {
                 ENABLE_OTA="false"
                 echo -e "\033[32m✅ 已自动连接官方安全网关 (@OmniBeacon_bot)。\033[0m"
                 echo -e "\033[33m👉 请确保您已在 TG 中关注官方机器人并发送过 /start，否则将无法接收消息。\033[0m"
+                echo -e "\n\033[33m⚠️ 【安全熔断提示】\033[0m"
+                echo -e "\033[33m由于您使用了官方公共网关，为防止潜在的滥用或供应链风险，本节点的 [OTA 远程升级] 权限已被系统底层强制禁用。\033[0m"
+                echo -e "\033[33m💡 若未来需要启用 OTA，请自建私有中枢后重新部署本节点。\033[0m"
             else
                 echo -e "\n\033[36m📘 私有 Bot 创建教程: \033[4m\033]8;;https://blog.iot-architect.com/engineering-practice/create-private-telegram-bot-via-botfather/\033\\👉 [点击此处直接在浏览器中打开]\033]8;;\033\\ 👈\033[0m"
+                echo -e "\033[90m   (若您的终端较老不支持点击，请手动复制: https://blog.iot-architect.com/engineering-practice/create-private-telegram-bot-via-botfather/ )\033[0m"
                 read -p "请输入您的私有 Telegram Bot Token: " RAW_TOKEN
                 USER_TOKEN=$(echo "$RAW_TOKEN" | tr -cd 'a-zA-Z0-9_:-')
                 while [ -z "$USER_TOKEN" ]; do
@@ -180,6 +183,7 @@ do_interactive_setup() {
                 echo -e "\033[32m✅ 已记录您的私有机器人 Token。\033[0m"
                 
                 echo -e "\n\033[36m[4.1/7] OTA 远程静默升级授权\033[0m"
+                echo -e "💡 开启后，您可以在 TG 面板一键将本节点热更新至最新版本。"
                 read -p "是否允许本节点接收 OTA 升级指令？(y/n, 默认y): " OTA_CHOICE
                 if [[ "$OTA_CHOICE" =~ ^[Nn]$ ]]; then
                     ENABLE_OTA="false"
@@ -191,6 +195,8 @@ do_interactive_setup() {
             fi
 
             echo -e "\n\033[33m💡 提示：如果您不知道下方自己的 Chat ID 是什么，可以关注 @userinfobot 获取。\033[0m"
+            echo -e "\033[36m📘 查看图文教程: \033[4m\033]8;;https://blog.iot-architect.com/engineering-practice/get-telegram-personal-id-via-userinfobot/\033\\👉 [点击此处直接在浏览器中打开]\033]8;;\033\\ 👈\033[0m"
+            echo -e "\033[90m   (若您的终端较老不支持点击，请手动复制: https://blog.iot-architect.com/engineering-practice/get-telegram-personal-id-via-userinfobot/ )\033[0m"
             read -p "请输入你的 Chat ID (必须准确，否则无法联控): " RAW_CHAT_ID
             CHAT_ID=$(echo "$RAW_CHAT_ID" | tr -cd '0-9-')
             
@@ -206,6 +212,7 @@ do_interactive_setup() {
             echo -e " 完成！"
             
             echo -e "💡 系统为您生成的推荐随机高位端口为: \033[32m$RANDOM_PORT\033[0m"
+            echo -e "\033[33m(该端口已通过本地占用校验，可直接使用)\033[0m"
             
             while true; do
                 read -p "请输入 Webhook 监听端口 (回车采用推荐, 或手动输入): " INPUT_PORT
@@ -233,14 +240,17 @@ do_interactive_setup() {
 
 do_final_report() {
     if [[ -n "$TG_TOKEN" ]] && [[ -n "$CHAT_ID" ]]; then
+        
+        # 注册报文中塞入多宿主弹匣 SAFE_COMM_IP
         REG_MSG="#REGISTER#|${REGION_CODE}|${NODE_NAME}|${SAFE_COMM_IP}|${AGENT_PORT}|${NODE_ALIAS}|${ENABLE_OTA}"
         
         if [ "$UPGRADE_MODE" == "true" ]; then
             OLD_VERSION=$(grep "^AGENT_VERSION=" "$CONFIG_FILE" | cut -d'"' -f2)
             [ -z "$OLD_VERSION" ] && OLD_VERSION="3.3.1"
             
+            # [v4.2.2 跨代升级防线] 只要是从低于 4.2.2 的版本升上来，强制要求用户点击注册指令同步多宿主弹匣
             if version_lt "$OLD_VERSION" "4.2.2"; then
-                echo -e "\n📡 [路由枢纽] 正在执行容灾架构重组 (v${OLD_VERSION} -> v${TARGET_VERSION})..."
+                echo -e "\n📡 [路由枢纽] 正在执行容灾架构重组 (v${OLD_VERSION} -> v${TARGET_VERSION})...."
                 TEXT_MSG="✨ *IP-Sentinel 容灾引擎热更新完成！*
 📍 节点：\`${NODE_ALIAS}\`
 🌐 养护 IP：\`${SAFE_PUBLIC_IP}\`
@@ -253,7 +263,9 @@ do_final_report() {
                 
                 JSON_PAYLOAD=$(jq -n --arg cid "$CHAT_ID" --arg txt "$TEXT_MSG" --arg cb "manage:${NODE_NAME}" '{chat_id: $cid, text: $txt, parse_mode: "Markdown", reply_markup: {inline_keyboard: [[{text: "⚙️ 调出该节点控制台", callback_data: $cb}]]}}')
                 curl -s -X POST "${TG_API_URL}" -H "Content-Type: application/json" -d "$JSON_PAYLOAD" >/dev/null 2>&1
+                
                 echo -e "\033[32m✅ 升级通知已推送！请前往 TG 点击注册指令完成身份同步！\033[0m"
+                
             else
                 echo -e "\n📡 [路由枢纽] 正在执行静默平滑升级 (v${OLD_VERSION} -> v${TARGET_VERSION})..."
                 TEXT_MSG="✨ *IP-Sentinel 引擎热更新完成！*
@@ -264,6 +276,7 @@ do_final_report() {
 
                 JSON_PAYLOAD=$(jq -n --arg cid "$CHAT_ID" --arg txt "$TEXT_MSG" --arg cb "manage:${NODE_NAME}" '{chat_id: $cid, text: $txt, parse_mode: "Markdown", reply_markup: {inline_keyboard: [[{text: "⚙️ 调出该节点控制台", callback_data: $cb}]]}}')
                 curl -s -X POST "${TG_API_URL}" -H "Content-Type: application/json" -d "$JSON_PAYLOAD" >/dev/null 2>&1
+
                 echo -e "\033[32m✅ 升级成功通知已推送到您的 Telegram！\033[0m"
             fi
             
@@ -273,14 +286,14 @@ do_final_report() {
             else
                 echo "AGENT_VERSION=\"$TARGET_VERSION\"" >> "$CONFIG_FILE"
             fi
+            
         else
             echo -e "\n📡 正在向指挥部发送注册暗号..."
-            SAFE_COMM_IP_ESC=$(echo "$SAFE_COMM_IP" | sed 's/_/\\_/g')
             
             TEXT_MSG="✨ *IP-Sentinel 部署成功！*
 📍 区域：${REGION_NAME}
 🌐 养护 IP：\`${SAFE_PUBLIC_IP}\`
-📡 容灾 IP：\`${SAFE_COMM_IP_ESC}\`
+📡 容灾 IP：\`${SAFE_COMM_IP}\`
 🔌 端口：\`${AGENT_PORT}\`
 
 🔑 *请点击下方指令复制并回复给机器人：*
@@ -307,12 +320,11 @@ do_show_summary() {
     fi
     echo "📍 你的本地守护区域已锁定为: $REGION_NAME"
     echo "⚙️ 哨兵现已开启 [每20分钟] 的高频高拟真养护循环。"
-    
     if [[ -n "$TG_TOKEN" ]]; then
         echo "📡 Webhook 监听已启动 (端口: $AGENT_PORT) 并向中枢发送了注册请求。"
         
         # ----------------------------------------------------------
-        # [优化项 2] 工业级防火墙双栈自动化放行操纵 (Autopilot Enforcer)
+        # [优化项 2] 自动化底层防火墙双栈对空通道放行
         # ----------------------------------------------------------
         echo -e "\n🛡️ \033[36m[🔥 防火墙自动化操纵] 正在检测本地防线并全开双栈对空通道...\033[0m"
         
@@ -324,7 +336,6 @@ do_show_summary() {
             firewall-cmd --reload >/dev/null 2>&1
             echo -e " ✅ \033[32mFirewalld 防火墙检测到活跃态，持久化策略重载完成。\033[0m"
         else
-            # 暴力双轨注入，全量覆盖原生 Netfilter 链路，全面放行多宿主通讯路径的所有冗余通道
             local fw_applied=false
             if command -v iptables >/dev/null 2>&1; then
                 iptables -I INPUT -p tcp --dport "$AGENT_PORT" -j ACCEPT >/dev/null 2>&1
@@ -348,6 +359,21 @@ do_show_summary() {
     fi
     echo "🗑️ 若未来需卸载，可重新运行本脚本选择[2]或执行: bash ${INSTALL_DIR}/core/uninstall.sh"
     echo "========================================================"
+
+    if [ "$UPGRADE_MODE" == "false" ]; then
+        echo -e "\n📡 正在向开源社区汇报装机量 (完全匿名，不收集IP)..."
+        AGENT_COUNT=$(curl -s -m 3 "https://ip-sentinel-count.samanthaestime296.workers.dev/ping/agent" || echo "")
+
+        if [ -n "$AGENT_COUNT" ] && [[ "$AGENT_COUNT" =~ ^[0-9]+$ ]]; then
+            echo -e "\033[32m✅ 感谢您成为全球第 ${AGENT_COUNT} 名 IP-Sentinel 节点维护者！\033[0m"
+        else
+            echo -e "\033[32m✅ 感谢您部署 IP-Sentinel！\033[0m"
+        fi
+    fi
+
+    echo -e "\n========================================================"
+    echo -e "⭐ \033[33m开源不易，如果 IP-Sentinel 提升了您的节点稳定性，请赐予我们一枚星标！\033[0m"
+    echo -e "💡 \033[32m您的每一颗 Star 都是我们持续对抗风控、维护更新指纹库的核心动力。\033[0m"
+    echo -e "👉 \033[36m\033[4m\033]8;;https://github.com/hotyue/IP-Sentinel\033\\点击此处直达 GitHub 仓库点亮 Star 🌟\033[0m\033]8;;\033\\"
+    echo -e "========================================================\n"
 }
-EOF
-chmod +x install/ui_menu.sh
