@@ -45,13 +45,10 @@ docker run -d \
 也可以使用 Compose。这个文件默认拉取 GHCR 镜像，适合 1Panel 等只放 Compose 文件的部署目录：
 
 ```bash
-cat > .env <<'EOF'
-TG_TOKEN=123456:replace_me
-MASTER_NODE_NAME=IP-Sentinel-Master
-TZ=Asia/Shanghai
-EOF
+cp .env.example .env
+# 编辑 .env，填入真实 TG_TOKEN
 
-docker compose -f docker-compose.master.yml up -d --build
+docker compose -f docker-compose.master.yml up -d
 ```
 
 ## 备份
