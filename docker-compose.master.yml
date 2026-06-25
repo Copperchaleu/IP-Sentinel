@@ -1,0 +1,23 @@
+services:
+  ip-sentinel-master:
+    build:
+      context: .
+      dockerfile: master/Dockerfile
+      args:
+        MASTER_VERSION: "4.3.1"
+    image: ip-sentinel-master:4.3.1
+    container_name: ip-sentinel-master
+    restart: unless-stopped
+    environment:
+      # 仅首次启动必填；master.conf 已存在后，卷内配置优先。
+      TG_TOKEN: "${TG_TOKEN:-}"
+      MASTER_NODE_NAME: "${MASTER_NODE_NAME:-IP-Sentinel-Master}"
+      IS_OFFICIAL_GATEWAY: "${IS_OFFICIAL_GATEWAY:-false}"
+      # 容器模式建议通过重建镜像升级，默认关闭 Master OTA。
+      ENABLE_MASTER_OTA: "${ENABLE_MASTER_OTA:-false}"
+      TZ: "${TZ:-Asia/Shanghai}"
+    volumes:
+      - ip-sentinel-master-data:/opt/ip_sentinel_master
+
+volumes:
+  ip-sentinel-master-data:
