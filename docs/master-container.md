@@ -8,6 +8,12 @@
 docker build -f master/Dockerfile -t ip-sentinel-master:4.3.1 .
 ```
 
+如果需要用 Compose 在完整源码目录里本地构建：
+
+```bash
+docker compose -f docker-compose.master.build.yml up -d --build
+```
+
 ## GitHub Actions 打包
 
 仓库内的 `.github/workflows/master_container.yml` 会在 `main` 分支相关文件变更、推送 `v*` 标签或手动触发时，自动构建并推送多架构镜像到 GitHub Container Registry：
@@ -33,10 +39,10 @@ docker run -d \
   -e TG_TOKEN="123456:replace_me" \
   -e MASTER_NODE_NAME="IP-Sentinel-Master" \
   -v ip-sentinel-master-data:/opt/ip_sentinel_master \
-  ip-sentinel-master:4.3.1
+  ghcr.io/copperchaleu/ip-sentinel-master:4.3.1
 ```
 
-也可以使用 Compose：
+也可以使用 Compose。这个文件默认拉取 GHCR 镜像，适合 1Panel 等只放 Compose 文件的部署目录：
 
 ```bash
 cat > .env <<'EOF'
@@ -104,11 +110,11 @@ docker run --rm \
   debian:bookworm-slim \
   tar xzf /backup/ip-sentinel-master-backup.tgz -C /data
 
-docker compose -f docker-compose.master.yml up -d --build
+docker compose -f docker-compose.master.yml up -d
 ```
 
 ## 注意事项
 
-- 容器模式默认关闭 Master OTA。升级时建议拉取新代码、重建镜像、重启容器。
+- 容器模式默认关闭 Master OTA。升级时建议拉取新镜像并重启容器；如果使用本地构建，则拉取新代码、重建镜像、重启容器。
 - 首次启动必须提供 `TG_TOKEN`。卷内已存在 `master.conf` 后，会优先使用保存的配置。
 - 如果需要主动用环境变量覆盖配置，启动一次时加入 `UPDATE_CONFIG_FROM_ENV=true`。

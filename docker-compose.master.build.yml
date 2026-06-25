@@ -1,6 +1,11 @@
 services:
   ip-sentinel-master:
-    image: ghcr.io/copperchaleu/ip-sentinel-master:4.3.1
+    build:
+      context: .
+      dockerfile: master/Dockerfile
+      args:
+        MASTER_VERSION: "4.3.1"
+    image: ip-sentinel-master:4.3.1
     container_name: ip-sentinel-master
     restart: unless-stopped
     environment:
