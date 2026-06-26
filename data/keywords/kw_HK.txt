@@ -1,3 +1,13 @@
+observatory
+天文臺
+kospi
+九龍 灣 運動場
+hk express
+hsi index
+paraguay vs australia
+美國對土耳其
+李嘉欣
+türkiye vs usa
 czech republic national football team vs mexico national football team standings
 樂風集團
 etv
@@ -19,7 +29,6 @@ yaxel lendeborg
 sk hynix stock
 海力士股價
 超級 市場
-kospi
 海力士
 郵政
 姜濤
@@ -89,12 +98,3 @@ argentina fc
 趙式芝
 林漪娸
 serco
-戰鬥機
-巴拿马
-小麵
-鍾 柔美
-劉 敏昌
-塞內加爾
-北都馬拉松
-大家樂
-古天樂
