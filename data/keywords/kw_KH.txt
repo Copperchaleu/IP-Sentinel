@@ -1,3 +1,5 @@
+mandy gta6
+port fc
 gta6
 007 actor robert pattinson james bond
 xiaomi 18 pro max
@@ -96,5 +98,3 @@ liverpool vs arsenal
 racing santander vs real madrid
 como vs venezia
 como
-meteorology
-rain
